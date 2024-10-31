@@ -1,0 +1,28 @@
+import pandas as pd
+import numpy as np
+
+# Load your original dataset
+data = pd.read_csv(r'C:\Users\zohaib khan\OneDrive\Desktop\USE ME\dump\zk\dryfruits.csv')
+
+# Define the number of augmented records to create
+num_augmented = 1000
+
+# Function to apply slight random variation to numeric features
+def augment_data(record, variation=0.05):
+    augmented_record = record.copy()
+    for col in record.index[:-1]:  # Exclude the 'Class' column
+        if np.issubdtype(record[col].dtype, np.number):  # Only augment numeric columns
+            # Add a random variation within 5% of the original value
+            augmented_record[col] = record[col] * (1 + np.random.uniform(-variation, variation))
+    return augmented_record
+
+# Generate augmented data
+augmented_data = pd.DataFrame([augment_data(data.iloc[i % len(data)]) for i in range(num_augmented)])
+
+# Retain the Class value for each augmented record from the original dataset
+augmented_data['Class'] = [data.iloc[i % len(data)]['Class'] for i in range(num_augmented)]
+
+# Save the augmented dataset to a new CSV file in the same directory
+augmented_data.to_csv(r'C:\Users\zohaib khan\OneDrive\Desktop\USE ME\dump\zk\augmented_dryfruits.csv', index=False)
+
+print("Augmented dataset saved as 'augmented_dryfruits.csv' in the specified directory.")
